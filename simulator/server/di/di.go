@@ -11,6 +11,7 @@ import (
 	clientset "k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
 	configv1 "k8s.io/kube-scheduler/config/v1"
+	"sigs.k8s.io/kube-scheduler-simulator/simulator/kwok"
 
 	"sigs.k8s.io/kube-scheduler-simulator/simulator/oneshotimporter"
 	"sigs.k8s.io/kube-scheduler-simulator/simulator/replayer"
@@ -31,6 +32,7 @@ type Container struct {
 	resourceSyncer                 ResourceSyncer
 	resourceWatcherService         ResourceWatcherService
 	replayService                  ReplayService
+	kwokService                    KwokService
 }
 
 // NewDIContainer initializes Container.
@@ -73,6 +75,7 @@ func NewDIContainer(
 	if replayEnabled {
 		c.replayService = replayer.New(resourceApplierService, replayerOptions)
 	}
+	c.kwokService = kwok.NewKwokService(client)
 
 	return c, nil
 }
@@ -116,4 +119,8 @@ func (c *Container) ResourceWatcherService() ResourceWatcherService {
 // ExtenderService returns ExtenderService.
 func (c *Container) ExtenderService() ExtenderService {
 	return c.schedulerService.ExtenderService()
+}
+
+func (c *Container) KwokService() KwokService {
+	return c.kwokService
 }

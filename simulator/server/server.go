@@ -37,6 +37,8 @@ func NewSimulatorServer(cfg *config.Config, dic *di.Container) *SimulatorServer 
 	resetHandler := handler.NewResetHandler(dic.ResetService())
 	resourcewatcherHandler := handler.NewResourceWatcherHandler(dic.ResourceWatcherService())
 	extenderHandler := handler.NewExtenderHandler(dic.ExtenderService())
+	// 新增：kwok集群处理器
+	kwokClusterHandler := handler.NewKwokClusterHandler(dic.KwokService())
 
 	// register apis
 	v1 := e.Group("/api/v1")
@@ -51,6 +53,7 @@ func NewSimulatorServer(cfg *config.Config, dic *di.Container) *SimulatorServer 
 
 	v1.GET("/listwatchresources", resourcewatcherHandler.ListWatchResources)
 
+	v1.POST("/addNode", kwokClusterHandler.AddNode)
 	RouteExtender(v1, extenderHandler)
 
 	// initialize SimulatorServer.
