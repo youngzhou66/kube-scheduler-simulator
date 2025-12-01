@@ -52,5 +52,28 @@ func (s *Service) AddNode(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	err = s.createDynamicDeviceInfoConfigMap(ctx, nodeName)
+	if err != nil {
+		return err
+	}
 	return nil
+}
+
+func (s *Service) createDynamicDeviceInfoConfigMap(ctx context.Context, nodeName string) error {
+	configMap := &corev1.ConfigMap{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      fmt.Sprintf("mindx-dl-deviceinfo-%s", nodeName),
+			Namespace: "kube-system",
+			Labels: map[string]string{
+				"mx-consumer-cim": "true",
+			},
+		},
+		Data: map[string]string{
+			"DeviceInfoCfg":       `{"DeviceInfo":{"DeviceList":{"huawei.com/Ascend910":"Ascend910-0,Ascend910-1,Ascend910-2,Ascend910-3,Ascend910-4,Ascend910-5,Ascend910-6,Ascend910-7","huawei.com/Ascend910-Fault":"[]","huawei.com/Ascend910-NetworkUnhealthy":"","huawei.com/Ascend910-Recovering":"","huawei.com/Ascend910-Unhealthy":""},"UpdateTime":1763713955},"SuperPodID":5,"ServerIndex":0,"RackID":6,"TopoCheck":"OK","CheckCode":"e5cc7a2c30df99b05fb3415484369006515105b0228fc26b097744dceede93ca"}`,
+			"ManuallySeparateNPU": "",
+		},
+	}
+
+	_, err := s.k8sClient.CoreV1().ConfigMaps("kube-system").Create(ctx, configMap, metav1.CreateOptions{})
+	return err
 }
