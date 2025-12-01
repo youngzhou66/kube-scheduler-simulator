@@ -3,6 +3,7 @@ package handler
 
 import (
 	"github.com/labstack/echo/v4"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/klog/v2"
 
 	"net/http"
@@ -20,7 +21,13 @@ func NewKwokClusterHandler(s di.KwokService) *KwokClusterHandler {
 // AddNode 向集群添加节点
 func (h *KwokClusterHandler) AddNode(c echo.Context) error {
 	ctx := c.Request().Context()
-	if err := h.service.AddNode(ctx); err != nil {
+
+	// 解析请求体中的Node配置
+	var node corev1.Node
+	if err := c.Bind(&node); err != nil {
+		klog.Errorf("Failed to parse request body: %+v", err)
+	}
+	if err := h.service.AddNode(ctx, &node); err != nil {
 		klog.Errorf("failed to reset all resources and schediler configuration: %+v", err)
 		return echo.NewHTTPError(http.StatusInternalServerError)
 	}
