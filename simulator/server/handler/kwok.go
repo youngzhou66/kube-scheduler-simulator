@@ -40,7 +40,7 @@ func (h *KwokClusterHandler) AddNode(c echo.Context) error {
 func (h *KwokClusterHandler) DeleteNode(c echo.Context) error {
 	ctx := c.Request().Context()
 	nodeName := c.Param(name)
-	if c.Param(nodeName) == "" {
+	if nodeName == "" {
 		return echo.NewHTTPError(http.StatusBadRequest, "node name cannot be empty")
 	}
 	if err := h.service.DeleteNode(ctx, nodeName); err != nil {
