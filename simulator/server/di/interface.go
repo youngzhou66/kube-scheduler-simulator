@@ -37,6 +37,7 @@ type ResetService interface {
 
 type KwokService interface {
 	AddNode(ctx context.Context, node *corev1.Node) error
+	DeleteNode(ctx context.Context, nodeName string) error
 }
 
 // OneShotClusterResourceImporter represents a service to import resources from a target cluster when starting the simulator.

@@ -8,6 +8,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/rand"
 	clientset "k8s.io/client-go/kubernetes"
+	"k8s.io/klog/v2"
 )
 
 const (
@@ -73,7 +74,6 @@ func (s *Service) createNodeAndConfigMap(ctx context.Context, node *corev1.Node,
 		_ = s.k8sClient.CoreV1().Nodes().Delete(ctx, nodeName, metav1.DeleteOptions{})
 		return fmt.Errorf("failed to create configmap for node %s: %w", nodeName, err)
 	}
-
 	return nil
 }
 
@@ -81,7 +81,6 @@ func (s *Service) createNodeAndConfigMap(ctx context.Context, node *corev1.Node,
 func (s *Service) updateNode(ctx context.Context, node *corev1.Node, existingNode *corev1.Node) error {
 	node.SetResourceVersion(existingNode.ResourceVersion)
 	node.SetUID(existingNode.UID)
-
 	_, err := s.k8sClient.CoreV1().Nodes().Update(ctx, node, metav1.UpdateOptions{})
 	return err
 }
@@ -90,7 +89,7 @@ func (s *Service) updateNode(ctx context.Context, node *corev1.Node, existingNod
 func (s *Service) createDeviceInfoConfigMap(ctx context.Context, nodeName string) error {
 	configMap := &corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      fmt.Sprintf("%s%s", configMapPrefix, nodeName),
+			Name:      getDeviceInfoConfigMapName(nodeName),
 			Namespace: kubeSystemNS,
 			Labels: map[string]string{
 				consumerCIMKey: consumerCIMVal,
@@ -103,4 +102,19 @@ func (s *Service) createDeviceInfoConfigMap(ctx context.Context, nodeName string
 	}
 	_, err := s.k8sClient.CoreV1().ConfigMaps(kubeSystemNS).Create(ctx, configMap, metav1.CreateOptions{})
 	return err
+}
+
+func getDeviceInfoConfigMapName(nodeName string) string {
+	return fmt.Sprintf("%s%s", configMapPrefix, nodeName)
+}
+
+// DeleteNode delete node
+func (s *Service) DeleteNode(ctx context.Context, nodeName string) error {
+	_, err := s.k8sClient.CoreV1().Nodes().Get(ctx, nodeName, metav1.GetOptions{})
+	if err != nil {
+		return err
+	}
+	err = s.k8sClient.CoreV1().ConfigMaps(kubeSystemNS).Delete(ctx, getDeviceInfoConfigMapName(nodeName), metav1.DeleteOptions{})
+	klog.Errorf("failed to delete node config map: %+v", err)
+	return s.k8sClient.CoreV1().Nodes().Delete(ctx, nodeName, metav1.DeleteOptions{})
 }
