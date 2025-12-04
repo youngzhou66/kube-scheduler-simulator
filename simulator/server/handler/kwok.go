@@ -21,14 +21,12 @@ func NewKwokClusterHandler(s di.KwokService) *KwokClusterHandler {
 // AddNode 向集群添加节点
 func (h *KwokClusterHandler) AddNode(c echo.Context) error {
 	ctx := c.Request().Context()
-
-	// 解析请求体中的Node配置
 	var node corev1.Node
 	if err := c.Bind(&node); err != nil {
 		klog.Errorf("Failed to parse request body: %+v", err)
 	}
 	if err := h.service.AddNode(ctx, &node); err != nil {
-		klog.Errorf("failed to reset all resources and schediler configuration: %+v", err)
+		klog.Errorf("failed to add node: %+v", err)
 		return echo.NewHTTPError(http.StatusInternalServerError)
 	}
 	return c.NoContent(http.StatusAccepted)
