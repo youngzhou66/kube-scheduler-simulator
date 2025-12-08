@@ -1,8 +1,8 @@
-// handler/kwok_cluster_handler.go
 package handler
 
 import (
 	"github.com/labstack/echo/v4"
+	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/klog/v2"
 
@@ -45,6 +45,34 @@ func (h *KwokClusterHandler) DeleteNode(c echo.Context) error {
 	}
 	if err := h.service.DeleteNode(ctx, nodeName); err != nil {
 		klog.Errorf("failed to delete node: %+v", err)
+		return echo.NewHTTPError(http.StatusInternalServerError)
+	}
+	return c.NoContent(http.StatusAccepted)
+}
+
+func (h *KwokClusterHandler) AddDeployment(c echo.Context) error {
+	ctx := c.Request().Context()
+	var deployment appsv1.Deployment
+	if err := c.Bind(&deployment); err != nil {
+		klog.Errorf("Failed to parse request body: %+v", err)
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid deployment format")
+	}
+	if err := h.service.AddDeployment(ctx, &deployment); err != nil {
+		klog.Errorf("failed to create deployment: %+v", err)
+		return echo.NewHTTPError(http.StatusInternalServerError)
+	}
+	return c.NoContent(http.StatusAccepted)
+}
+
+func (h *KwokClusterHandler) DeleteDeployment(c echo.Context) error {
+	ctx := c.Request().Context()
+	namespace := c.Param("namespace")
+	deploymentName := c.Param("name")
+	if namespace == "" || deploymentName == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "namespace and name cannot be empty")
+	}
+	if err := h.service.DeleteDeployment(ctx, namespace, deploymentName); err != nil {
+		klog.Errorf("failed to delete deployment: %+v", err)
 		return echo.NewHTTPError(http.StatusInternalServerError)
 	}
 	return c.NoContent(http.StatusAccepted)

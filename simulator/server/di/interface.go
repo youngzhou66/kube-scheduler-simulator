@@ -2,8 +2,8 @@ package di
 
 import (
 	"context"
+	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
-
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	configv1 "k8s.io/kube-scheduler/config/v1"
 	extenderv1 "k8s.io/kube-scheduler/extender/v1"
@@ -38,6 +38,8 @@ type ResetService interface {
 type KwokService interface {
 	AddNode(ctx context.Context, node *corev1.Node) error
 	DeleteNode(ctx context.Context, nodeName string) error
+	AddDeployment(ctx context.Context, deployment *appsv1.Deployment) error
+	DeleteDeployment(ctx context.Context, nameSpace string, name string) error
 }
 
 // OneShotClusterResourceImporter represents a service to import resources from a target cluster when starting the simulator.

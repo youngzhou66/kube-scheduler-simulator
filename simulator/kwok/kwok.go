@@ -3,6 +3,8 @@ package kwok
 import (
 	"context"
 	"fmt"
+
+	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -117,4 +119,29 @@ func (s *Service) DeleteNode(ctx context.Context, nodeName string) error {
 	err = s.k8sClient.CoreV1().ConfigMaps(kubeSystemNS).Delete(ctx, getDeviceInfoConfigMapName(nodeName), metav1.DeleteOptions{})
 	klog.Errorf("failed to delete node config map: %+v", err)
 	return s.k8sClient.CoreV1().Nodes().Delete(ctx, nodeName, metav1.DeleteOptions{})
+}
+
+// AddDeployment add deployment
+func (s *Service) AddDeployment(ctx context.Context, deployment *appsv1.Deployment) error {
+	if deployment.Name == "" {
+		return fmt.Errorf("deployment name cannot be empty")
+	}
+	if deployment.Namespace == "" {
+		deployment.Namespace = "default"
+	}
+	_, err := s.k8sClient.AppsV1().Deployments(deployment.Namespace).Create(ctx, deployment, metav1.CreateOptions{})
+	return err
+}
+
+// DeleteDeployment delete deployment
+func (s *Service) DeleteDeployment(ctx context.Context, namespace, name string) error {
+	_, err := s.k8sClient.AppsV1().Deployments(namespace).Get(ctx, name, metav1.GetOptions{})
+	if err != nil {
+		return fmt.Errorf("deployment %s/%s not found: %w", namespace, name, err)
+	}
+	err = s.k8sClient.AppsV1().Deployments(namespace).Delete(ctx, name, metav1.DeleteOptions{})
+	if err != nil {
+		return fmt.Errorf("failed to delete deployment %s/%s: %w", namespace, name, err)
+	}
+	return err
 }
