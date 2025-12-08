@@ -50,9 +50,9 @@ func (s *Service) AddNodes(ctx context.Context, node *corev1.Node, count int) er
 	nodeName := node.Name
 	for i := 1; i <= count; i++ {
 		node.Name = fmt.Sprintf("%s-%d", nodeName, i)
-	}
-	if err := s.createOrUpdateNode(ctx, node, nodeName); err != nil {
-		return fmt.Errorf("failed to create or update node %s: %w", nodeName, err)
+		if err := s.createOrUpdateNode(ctx, node, node.Name); err != nil {
+			return fmt.Errorf("failed to create or update node %s: %w", nodeName, err)
+		}
 	}
 	return nil
 }
