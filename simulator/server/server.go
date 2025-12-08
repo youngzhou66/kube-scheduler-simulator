@@ -57,6 +57,7 @@ func NewSimulatorServer(cfg *config.Config, dic *di.Container) *SimulatorServer 
 	v1.DELETE("/deleteNode/:name", kwokClusterHandler.DeleteNode)
 	v1.POST("/addDeployment", kwokClusterHandler.AddDeployment)
 	v1.DELETE("/deleteDeployment/:namespace/:name", kwokClusterHandler.DeleteDeployment)
+	v1.POST("/addDeployments/:count", kwokClusterHandler.AddDeployments)
 	RouteExtender(v1, extenderHandler)
 
 	// initialize SimulatorServer.

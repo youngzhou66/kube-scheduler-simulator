@@ -40,6 +40,7 @@ type KwokService interface {
 	DeleteNode(ctx context.Context, nodeName string) error
 	AddDeployment(ctx context.Context, deployment *appsv1.Deployment) error
 	DeleteDeployment(ctx context.Context, nameSpace string, name string) error
+	AddDeployments(ctx context.Context, deployment *appsv1.Deployment, count int) error
 }
 
 // OneShotClusterResourceImporter represents a service to import resources from a target cluster when starting the simulator.

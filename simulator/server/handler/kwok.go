@@ -5,6 +5,7 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/klog/v2"
+	"strconv"
 
 	"net/http"
 	"sigs.k8s.io/kube-scheduler-simulator/simulator/server/di"
@@ -73,6 +74,26 @@ func (h *KwokClusterHandler) DeleteDeployment(c echo.Context) error {
 	}
 	if err := h.service.DeleteDeployment(ctx, namespace, deploymentName); err != nil {
 		klog.Errorf("failed to delete deployment: %+v", err)
+		return echo.NewHTTPError(http.StatusInternalServerError)
+	}
+	return c.NoContent(http.StatusAccepted)
+}
+
+func (h *KwokClusterHandler) AddDeployments(c echo.Context) error {
+	ctx := c.Request().Context()
+	countParam := c.Param("count")
+	count, err := strconv.Atoi(countParam)
+	if err != nil || count <= 0 {
+		klog.Errorf("Invalid count parameter: %s, error: %+v", countParam, err)
+		return echo.NewHTTPError(http.StatusBadRequest, "count must be a positive integer")
+	}
+	var deployment appsv1.Deployment
+	if err := c.Bind(&deployment); err != nil {
+		klog.Errorf("Failed to parse request body: %+v", err)
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid deployment format")
+	}
+	if err := h.service.AddDeployments(ctx, &deployment, count); err != nil {
+		klog.Errorf("failed to create deployment: %+v", err)
 		return echo.NewHTTPError(http.StatusInternalServerError)
 	}
 	return c.NoContent(http.StatusAccepted)
