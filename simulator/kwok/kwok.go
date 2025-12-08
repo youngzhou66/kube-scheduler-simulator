@@ -148,15 +148,16 @@ func (s *Service) DeleteDeployment(ctx context.Context, namespace, name string) 
 
 // AddDeployments add deployments
 func (s *Service) AddDeployments(ctx context.Context, deployment *appsv1.Deployment, count int) error {
-	if deployment.Name == "" {
+	deploymentName := deployment.Name
+	if deploymentName == "" {
 		return fmt.Errorf("deployment name cannot be empty")
 	}
 	if deployment.Namespace == "" {
 		deployment.Namespace = "default"
 	}
-	// todo 要不要优化成多线程
+	// todo 要不要优化成多线程 现在好慢...
 	for i := 1; i <= count; i++ {
-		deployment.Name = fmt.Sprintf("%s-%d", deployment.Name, i)
+		deployment.Name = fmt.Sprintf("%s-%d", deploymentName, i)
 		_, err := s.k8sClient.AppsV1().Deployments(deployment.Namespace).Create(ctx, deployment, metav1.CreateOptions{})
 		if err != nil {
 			return err
