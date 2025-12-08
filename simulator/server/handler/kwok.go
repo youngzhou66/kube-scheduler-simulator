@@ -37,6 +37,30 @@ func (h *KwokClusterHandler) AddNode(c echo.Context) error {
 	return c.NoContent(http.StatusAccepted)
 }
 
+// AddNodes add nodes
+func (h *KwokClusterHandler) AddNodes(c echo.Context) error {
+	ctx := c.Request().Context()
+	countParam := c.Param("count")
+	count, err := strconv.Atoi(countParam)
+	if err != nil || count <= 0 {
+		klog.Errorf("Invalid count parameter: %s, error: %+v", countParam, err)
+		return echo.NewHTTPError(http.StatusBadRequest, "count must be a positive integer")
+	}
+	var node corev1.Node
+	if err := c.Bind(&node); err != nil {
+		klog.Errorf("Failed to parse request body: %+v", err)
+	}
+	if node.Name == "" {
+		klog.Errorf("failed to add nodes, node name is empty")
+		return echo.NewHTTPError(http.StatusInternalServerError)
+	}
+	if err := h.service.AddNodes(ctx, &node, count); err != nil {
+		klog.Errorf("failed to add nodes: %+v", err)
+		return echo.NewHTTPError(http.StatusInternalServerError)
+	}
+	return c.NoContent(http.StatusAccepted)
+}
+
 // DeleteNode delete node
 func (h *KwokClusterHandler) DeleteNode(c echo.Context) error {
 	ctx := c.Request().Context()

@@ -54,10 +54,11 @@ func NewSimulatorServer(cfg *config.Config, dic *di.Container) *SimulatorServer 
 	v1.GET("/listwatchresources", resourcewatcherHandler.ListWatchResources)
 
 	v1.POST("/addNode", kwokClusterHandler.AddNode)
+	v1.POST("/addNodes/:count", kwokClusterHandler.AddNodes)
 	v1.DELETE("/deleteNode/:name", kwokClusterHandler.DeleteNode)
 	v1.POST("/addDeployment", kwokClusterHandler.AddDeployment)
-	v1.DELETE("/deleteDeployment/:namespace/:name", kwokClusterHandler.DeleteDeployment)
 	v1.POST("/addDeployments/:count", kwokClusterHandler.AddDeployments)
+	v1.DELETE("/deleteDeployment/:namespace/:name", kwokClusterHandler.DeleteDeployment)
 	RouteExtender(v1, extenderHandler)
 
 	// initialize SimulatorServer.

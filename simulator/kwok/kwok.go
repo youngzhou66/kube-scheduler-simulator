@@ -45,6 +45,18 @@ func (s *Service) AddNode(ctx context.Context, node *corev1.Node) error {
 	return nil
 }
 
+func (s *Service) AddNodes(ctx context.Context, node *corev1.Node, count int) error {
+	// todo 要不要优化成多线程 现在好慢...
+	nodeName := node.Name
+	for i := 1; i <= count; i++ {
+		node.Name = fmt.Sprintf("%s-%d", nodeName, i)
+	}
+	if err := s.createOrUpdateNode(ctx, node, nodeName); err != nil {
+		return fmt.Errorf("failed to create or update node %s: %w", nodeName, err)
+	}
+	return nil
+}
+
 // ensureNodeName ensure node name
 func (s *Service) ensureNodeName(node *corev1.Node) string {
 	if node.Name != "" {
@@ -133,19 +145,6 @@ func (s *Service) AddDeployment(ctx context.Context, deployment *appsv1.Deployme
 	return err
 }
 
-// DeleteDeployment delete deployment
-func (s *Service) DeleteDeployment(ctx context.Context, namespace, name string) error {
-	_, err := s.k8sClient.AppsV1().Deployments(namespace).Get(ctx, name, metav1.GetOptions{})
-	if err != nil {
-		return fmt.Errorf("deployment %s/%s not found: %w", namespace, name, err)
-	}
-	err = s.k8sClient.AppsV1().Deployments(namespace).Delete(ctx, name, metav1.DeleteOptions{})
-	if err != nil {
-		return fmt.Errorf("failed to delete deployment %s/%s: %w", namespace, name, err)
-	}
-	return err
-}
-
 // AddDeployments add deployments
 func (s *Service) AddDeployments(ctx context.Context, deployment *appsv1.Deployment, count int) error {
 	deploymentName := deployment.Name
@@ -164,4 +163,17 @@ func (s *Service) AddDeployments(ctx context.Context, deployment *appsv1.Deploym
 		}
 	}
 	return nil
+}
+
+// DeleteDeployment delete deployment
+func (s *Service) DeleteDeployment(ctx context.Context, namespace, name string) error {
+	_, err := s.k8sClient.AppsV1().Deployments(namespace).Get(ctx, name, metav1.GetOptions{})
+	if err != nil {
+		return fmt.Errorf("deployment %s/%s not found: %w", namespace, name, err)
+	}
+	err = s.k8sClient.AppsV1().Deployments(namespace).Delete(ctx, name, metav1.DeleteOptions{})
+	if err != nil {
+		return fmt.Errorf("failed to delete deployment %s/%s: %w", namespace, name, err)
+	}
+	return err
 }
