@@ -39,6 +39,8 @@ func NewKwokService(k8sClient clientset.Interface) *Service {
 // AddNode add node
 func (s *Service) AddNode(ctx context.Context, node *corev1.Node) error {
 	nodeName := s.ensureNodeName(node)
+	// TODO 测试日志
+	klog.Errorf("add nodeName: %+v", nodeName)
 	if err := s.createOrUpdateNode(ctx, node, nodeName); err != nil {
 		return fmt.Errorf("failed to create or update node %s: %w", nodeName, err)
 	}
@@ -70,13 +72,20 @@ func (s *Service) ensureNodeName(node *corev1.Node) string {
 // createOrUpdateNode create or update node
 func (s *Service) createOrUpdateNode(ctx context.Context, node *corev1.Node, nodeName string) error {
 	existingNode, err := s.k8sClient.CoreV1().Nodes().Get(ctx, nodeName, metav1.GetOptions{})
-	if errors.IsNotFound(err) {
-		return s.createNodeAndConfigMap(ctx, node, nodeName)
+	if err == nil {
+		// TODO 测试日志
+		klog.Error("add node 1")
+		return s.updateNode(ctx, node, existingNode)
 	}
-	if err != nil {
+	// 如果出现别的err 说明有问题 return
+	if !errors.IsNotFound(err) {
+		// TODO 测试日志
+		klog.Error("add node 2")
 		return err
 	}
-	return s.updateNode(ctx, node, existingNode)
+	// TODO 测试日志
+	klog.Error("add node 3")
+	return s.createNodeAndConfigMap(ctx, node, nodeName)
 }
 
 // createNodeWithConfigMap create node and cm
