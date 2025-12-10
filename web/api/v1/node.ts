@@ -1,7 +1,10 @@
 import { V1Node, V1NodeList } from "@kubernetes/client-node";
 import { AxiosInstance } from "axios";
 
-export default function nodeAPI(k8sInstance: AxiosInstance) {
+export default function nodeAPI(
+  k8sInstance: AxiosInstance,
+  instance: AxiosInstance
+) {
   return {
     // createNode accepts only Node that has .metadata.GeneratedName.
     // If you want to create a Node that has .metadata.Name, use applyNode instead.
