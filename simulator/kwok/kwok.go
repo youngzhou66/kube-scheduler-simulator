@@ -23,7 +23,7 @@ const (
 )
 
 // deviceInfo
-const deviceInfoConfigTemplate = `{"DeviceInfo":{"DeviceList":{"huawei.com/Ascend910":"Ascend910-0,Ascend910-1,Ascend910-2,Ascend910-3,Ascend910-4,Ascend910-5,Ascend910-6,Ascend910-7","huawei.com/Ascend910-Fault":"[]","huawei.com/Ascend910-NetworkUnhealthy":"","huawei.com/Ascend910-Recovering":"","huawei.com/Ascend910-Unhealthy":""},"UpdateTime":1763713955},"SuperPodID":5,"ServerIndex":0,"RackID":6,"TopoCheck":"OK","CheckCode":"e5cc7a2c30df99b05fb3415484369006515105b0228fc26b097744dceede93ca"}`
+const deviceInfoConfigTemplate = `{"DeviceInfo":{"DeviceList":{"huawei.com/Ascend910":"Ascend910-0,Ascend910-1,Ascend910-2,Ascend910-3,Ascend910-4,Ascend910-5,Ascend910-6,Ascend910-7","huawei.com/Ascend910-Fault":"[]","huawei.com/Ascend910-NetworkUnhealthy":"","huawei.com/Ascend910-Recovering":"","huawei.com/Ascend910-Unhealthy":""},"UpdateTime":1763713955},"SuperPodID":%s,"ServerIndex":0,"RackID":%s,"TopoCheck":"OK","CheckCode":"e5cc7a2c30df99b05fb3415484369006515105b0228fc26b097744dceede93ca"}`
 
 type Service struct {
 	k8sClient clientset.Interface
@@ -73,18 +73,11 @@ func (s *Service) ensureNodeName(node *corev1.Node) string {
 func (s *Service) createOrUpdateNode(ctx context.Context, node *corev1.Node, nodeName string) error {
 	existingNode, err := s.k8sClient.CoreV1().Nodes().Get(ctx, nodeName, metav1.GetOptions{})
 	if err == nil {
-		// TODO 测试日志
-		klog.Error("add node 1")
-		return s.updateNode(ctx, node, existingNode)
+		return s.updateNodeAndConfigMap(ctx, node, existingNode)
 	}
-	// 如果出现别的err 说明有问题 return
 	if !errors.IsNotFound(err) {
-		// TODO 测试日志
-		klog.Error("add node 2")
 		return err
 	}
-	// TODO 测试日志
-	klog.Error("add node 3")
 	return s.createNodeAndConfigMap(ctx, node, nodeName)
 }
 
@@ -93,7 +86,7 @@ func (s *Service) createNodeAndConfigMap(ctx context.Context, node *corev1.Node,
 	if _, err := s.k8sClient.CoreV1().Nodes().Create(ctx, node, metav1.CreateOptions{}); err != nil {
 		return err
 	}
-	if err := s.createDeviceInfoConfigMap(ctx, nodeName); err != nil {
+	if err := s.createDeviceInfoConfigMap(ctx, node); err != nil {
 		_ = s.k8sClient.CoreV1().Nodes().Delete(ctx, nodeName, metav1.DeleteOptions{})
 		return fmt.Errorf("failed to create configmap for node %s: %w", nodeName, err)
 	}
@@ -101,28 +94,39 @@ func (s *Service) createNodeAndConfigMap(ctx context.Context, node *corev1.Node,
 }
 
 // updateNode update node
-func (s *Service) updateNode(ctx context.Context, node *corev1.Node, existingNode *corev1.Node) error {
+func (s *Service) updateNodeAndConfigMap(ctx context.Context, node *corev1.Node, existingNode *corev1.Node) error {
 	node.SetResourceVersion(existingNode.ResourceVersion)
 	node.SetUID(existingNode.UID)
 	_, err := s.k8sClient.CoreV1().Nodes().Update(ctx, node, metav1.UpdateOptions{})
+	if err != nil {
+		return err
+	}
+	configMap := s.getNodeCm(node)
+	_, err = s.k8sClient.CoreV1().ConfigMaps(kubeSystemNS).Update(ctx, configMap, metav1.UpdateOptions{})
 	return err
 }
 
-// createDeviceInfoConfigMap create device info configmap
-func (s *Service) createDeviceInfoConfigMap(ctx context.Context, nodeName string) error {
+func (s *Service) getNodeCm(node *corev1.Node) *corev1.ConfigMap {
+	deviceInfo := fmt.Sprintf(deviceInfoConfigTemplate, node.ObjectMeta.Annotations["superPodID"], node.ObjectMeta.Annotations["rackID"])
 	configMap := &corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      getDeviceInfoConfigMapName(nodeName),
+			Name:      getDeviceInfoConfigMapName(node.Name),
 			Namespace: kubeSystemNS,
 			Labels: map[string]string{
 				consumerCIMKey: consumerCIMVal,
 			},
 		},
 		Data: map[string]string{
-			deviceInfoKey:  deviceInfoConfigTemplate,
+			deviceInfoKey:  deviceInfo,
 			separateNPUKey: "",
 		},
 	}
+	return configMap
+}
+
+// createDeviceInfoConfigMap create device info configmap
+func (s *Service) createDeviceInfoConfigMap(ctx context.Context, node *corev1.Node) error {
+	configMap := s.getNodeCm(node)
 	_, err := s.k8sClient.CoreV1().ConfigMaps(kubeSystemNS).Create(ctx, configMap, metav1.CreateOptions{})
 	return err
 }
