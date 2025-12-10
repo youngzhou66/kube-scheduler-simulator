@@ -33,7 +33,7 @@ export default defineComponent({
   setup() {
     const { app } = useContext();
     provide(PodAPIKey, podAPI(app.$k8sInstance));
-    provide(NodeAPIKey, nodeAPI(app.$k8sInstance));
+    provide(NodeAPIKey, nodeAPI(app.$k8sInstance, app.$instance));
     provide(PriorityClassAPIKey, priorityClassAPI(app.$k8sSchedulingInstance));
     provide(ExportAPIKey, exportAPI(app.$instance));
     provide(PVAPIKey, pvAPI(app.$k8sInstance));

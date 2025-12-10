@@ -1,16 +1,40 @@
 metadata:
   generateName: node-
-  labels: {}
+  name: node-test
+  annotations:
+    baseDeviceInfos: '{"Ascend910-0":{"IP":"0.0.0.0","SuperDeviceID":0,"levelList":[{"level":0,"info":{"UB":{"net_layer":0,"net_instance_id":"0_0","net_type":"TOPO_FILE_DESC","net_attr":"","rank_addr_list":[{"addr_type":"EID","addr":"000000000000002000100000df00000a","ports":["1/0"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df00000b","ports":["1/1"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df00000c","ports":["1/2"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df00000d","ports":["1/3"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df00000e","ports":["1/4"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df000011","ports":["1/7"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df000012","ports":["1/8"],"plane_id":"1"}]}}}]},"Ascend910-1":{"IP":"0.0.1.0","SuperDeviceID":1,"levelList":[{"level":0,"info":{"UB":{"net_layer":0,"net_instance_id":"0_0","net_type":"TOPO_FILE_DESC","net_attr":"","rank_addr_list":[{"addr_type":"EID","addr":"000000000000002000100000df00001c","ports":["1/0"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df00001d","ports":["1/1"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df00001e","ports":["1/2"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df00001f","ports":["1/3"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df000020","ports":["1/4"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df000023","ports":["1/7"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df000024","ports":["1/8"],"plane_id":"1"}]}}}]},"Ascend910-2":{"IP":"0.0.2.0","SuperDeviceID":2,"levelList":[{"level":0,"info":{"UB":{"net_layer":0,"net_instance_id":"0_0","net_type":"TOPO_FILE_DESC","net_attr":"","rank_addr_list":[{"addr_type":"EID","addr":"000000000000002000100000df00002e","ports":["1/0"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df00002f","ports":["1/1"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df000030","ports":["1/2"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df000031","ports":["1/3"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df000032","ports":["1/4"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df000035","ports":["1/7"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df000036","ports":["1/8"],"plane_id":"1"}]}}}]},"Ascend910-3":{"IP":"0.0.3.0","SuperDeviceID":3,"levelList":[{"level":0,"info":{"UB":{"net_layer":0,"net_instance_id":"0_0","net_type":"TOPO_FILE_DESC","net_attr":"","rank_addr_list":[{"addr_type":"EID","addr":"000000000000002000100000df000040","ports":["1/0"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df000041","ports":["1/1"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df000042","ports":["1/2"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df000043","ports":["1/3"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df000044","ports":["1/4"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df000047","ports":["1/7"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df000048","ports":["1/8"],"plane_id":"1"}]}}}]},"Ascend910-4":{"IP":"0.0.4.0","SuperDeviceID":4,"levelList":[{"level":0,"info":{"UB":{"net_layer":0,"net_instance_id":"0_0","net_type":"TOPO_FILE_DESC","net_attr":"","rank_addr_list":[{"addr_type":"EID","addr":"000000000000002000100000df000052","ports":["1/0"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df000053","ports":["1/1"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df000054","ports":["1/2"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df000055","ports":["1/3"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df000056","ports":["1/4"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df000059","ports":["1/7"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df00005a","ports":["1/8"],"plane_id":"1"}]}}}]},"Ascend910-5":{"IP":"0.0.5.0","SuperDeviceID":5,"levelList":[{"level":0,"info":{"UB":{"net_layer":0,"net_instance_id":"0_0","net_type":"TOPO_FILE_DESC","net_attr":"","rank_addr_list":[{"addr_type":"EID","addr":"000000000000002000100000df000064","ports":["1/0"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df000065","ports":["1/1"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df000066","ports":["1/2"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df000067","ports":["1/3"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df000068","ports":["1/4"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df00006b","ports":["1/7"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df00006c","ports":["1/8"],"plane_id":"1"}]}}}]},"Ascend910-6":{"IP":"0.0.6.0","SuperDeviceID":6,"levelList":[{"level":0,"info":{"UB":{"net_layer":0,"net_instance_id":"0_0","net_type":"TOPO_FILE_DESC","net_attr":"","rank_addr_list":[{"addr_type":"EID","addr":"000000000000002000100000df000076","ports":["1/0"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df000077","ports":["1/1"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df000078","ports":["1/2"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df000079","ports":["1/3"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df00007a","ports":["1/4"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df00007d","ports":["1/7"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df00007e","ports":["1/8"],"plane_id":"1"}]}}}]},"Ascend910-7":{"IP":"0.0.7.0","SuperDeviceID":7,"levelList":[{"level":0,"info":{"UB":{"net_layer":0,"net_instance_id":"0_0","net_type":"TOPO_FILE_DESC","net_attr":"","rank_addr_list":[{"addr_type":"EID","addr":"000000000000002000100000df000088","ports":["1/0"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df000089","ports":["1/1"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df00008a","ports":["1/2"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df00008b","ports":["1/3"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df00008c","ports":["1/4"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df00008f","ports":["1/7"],"plane_id":"1"},{"addr_type":"EID","addr":"000000000000002000100000df000090","ports":["1/8"],"plane_id":"1"}]}}}]}}'
+    rackID: "6"
+    serverIndex: "0"
+    serverType: ""
+    superPodID: "5"
+    version: Ascend910A5
+  labels:
+    accelerator: huawei-Ascend910
+    accelerator-type: 900SuperPod-A5-8
+    beta.kubernetes.io/arch: arm64
+    beta.kubernetes.io/os: linux
+    host-arch: huawei-arm
+    kubernetes.io/arch: arm64
+    kubernetes.io/hostname: work1
+    kubernetes.io/os: linux
+    mind-cluster/npu-chip-memory: 32G
+    node-role.kubernetes.io/worker: worker
+    node.kubernetes.io/npu.chip.name: Ascend910_7592
+    ring-controller.atlas: ascend-910d
+    servertype: Ascend910A5-25
+    workerselector: dls-worker-node
 spec: {}
 status:
   capacity:
-    cpu: "4"
+    cpu: '8'
     memory: 32Gi
     pods: "110"
+    huawei.com/Ascend910: "8"
   allocatable:
-    cpu: "4"
+    cpu: "8"
     memory: 32Gi
     pods: "110"
+    huawei.com/Ascend910: "8"
   phase: Running
   conditions:
     - type: Ready

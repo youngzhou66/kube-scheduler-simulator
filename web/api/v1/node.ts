@@ -15,11 +15,9 @@ export default function nodeAPI(k8sInstance: AxiosInstance) {
         if (req.metadata.managedFields) {
           delete req.metadata.managedFields;
         }
-        const res = await k8sInstance.post<V1Node>(
-          "/nodes?fieldManager=simulator&force=true",
-          req,
-          { headers: { "Content-Type": "application/yaml" } }
-        );
+        const res = await instance.post<V1Node>("/addNode", req, {
+          headers: { "Content-Type": "application/json" },
+        });
         return res.data;
       } catch (e: any) {
         throw new Error(`failed to create node: ${e}`);
@@ -66,7 +64,7 @@ export default function nodeAPI(k8sInstance: AxiosInstance) {
 
     deleteNode: async (name: string) => {
       try {
-        const res = await k8sInstance.delete(`/nodes/${name}`, {});
+        const res = await instance.delete(`/deleteNode/${name}`, {});
         return res.data;
       } catch (e: any) {
         throw new Error(`failed to delete node: ${e}`);
