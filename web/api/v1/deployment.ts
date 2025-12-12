@@ -13,7 +13,7 @@ export default function deploymentAPI(
       }
     },
 
-    createDeployment: async () => {
+    createDeployment: async (req: V1Deployment) => {
       try {
         const res = await instance.post<V1Deployment>("/addDeployment", req, {
           headers: { "Content-Type": "application/json" },
