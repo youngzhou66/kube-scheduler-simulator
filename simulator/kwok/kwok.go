@@ -3,6 +3,7 @@ package kwok
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -47,14 +48,49 @@ func (s *Service) AddNode(ctx context.Context, node *corev1.Node) error {
 	return nil
 }
 
+//func (s *Service) AddNodes(ctx context.Context, node *corev1.Node, count int) error {
+//	// todo 要不要优化成多线程 现在好慢...
+//	nodeName := node.Name
+//	for i := 1; i <= count; i++ {
+//		node.Name = fmt.Sprintf("%s-%d", nodeName, i)
+//		if err := s.createOrUpdateNode(ctx, node, node.Name); err != nil {
+//			return fmt.Errorf("failed to create or update node %s: %w", nodeName, err)
+//		}
+//	}
+//	return nil
+//}
+
 func (s *Service) AddNodes(ctx context.Context, node *corev1.Node, count int) error {
-	// todo 要不要优化成多线程 现在好慢...
 	nodeName := node.Name
-	for i := 1; i <= count; i++ {
-		node.Name = fmt.Sprintf("%s-%d", nodeName, i)
-		if err := s.createOrUpdateNode(ctx, node, node.Name); err != nil {
-			return fmt.Errorf("failed to create or update node %s: %w", nodeName, err)
-		}
+	errCh := make(chan error, (count+7)/8) // 缓冲通道存储错误
+	var wg sync.WaitGroup
+	threadCount := (count + 7) / 8
+	for t := 0; t < threadCount; t++ {
+		wg.Add(1)
+		go func(threadID int) {
+			defer wg.Done()
+			start := threadID*8 + 1
+			end := start + 7
+			if end > count {
+				end = count
+			}
+			nodeCopy := node.DeepCopy()
+			nodeCopy.Annotations["rackID"] = fmt.Sprintf("%d", threadID)
+			for i := start; i <= end; i++ {
+				nodeCopy.Name = fmt.Sprintf("%s-%d", nodeName, i)
+				if err := s.createOrUpdateNode(ctx, nodeCopy, nodeCopy.Name); err != nil {
+					errCh <- fmt.Errorf("thread %d: failed to create node %s: %w",
+						threadID, nodeCopy.Name, err)
+					return
+				}
+			}
+		}(t)
+	}
+
+	wg.Wait()
+	close(errCh)
+	if len(errCh) > 0 {
+		return <-errCh // 返回第一个错误
 	}
 	return nil
 }
