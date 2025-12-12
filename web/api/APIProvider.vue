@@ -7,6 +7,7 @@
 <script lang="ts">
 import { defineComponent, provide, useContext } from "@nuxtjs/composition-api";
 import podAPI from "./v1/pod";
+import deploymentAPI from "~/api/v1/deployment";
 import nodeAPI from "./v1/node";
 import priorityClassAPI from "./v1/priorityclass";
 import exportAPI from "./v1/export";
@@ -28,6 +29,7 @@ import { SchedulerconfigurationAPIKey } from "./APIProviderKeys";
 import { StorageClassAPIKey } from "./APIProviderKeys";
 import { NamespaceAPIKey } from "./APIProviderKeys";
 import { WatcherAPIKey } from "./APIProviderKeys";
+import { DeploymentAPIKey } from "./APIProviderKeys";
 
 export default defineComponent({
   setup() {
@@ -46,6 +48,7 @@ export default defineComponent({
     provide(StorageClassAPIKey, storageClassAPI(app.$k8sStorageInstance));
     provide(NamespaceAPIKey, namespaceAPI(app.$k8sInstance))
     provide(WatcherAPIKey, watcherAPI(app.$instance));
+    provide(DeploymentAPIKey, deploymentAPI(app.$instance));
     return {};
   },
 });

@@ -4,6 +4,10 @@ const getTemplateEnv = (hostEnv) => {
   return hostEnv !== "production"
     ? {
         // Build Configuration: https://go.nuxtjs.dev/config-build
+        DEPLOYMENT_TEMPLATE: fs.readFileSync(
+          "./components/lib/templates/deployment.yaml",
+          "utf8"
+        ),
         POD_TEMPLATE: fs.readFileSync(
           "./components/lib/templates/pod.yaml",
           "utf8"

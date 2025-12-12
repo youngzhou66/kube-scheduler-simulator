@@ -22,6 +22,7 @@ import {
   storageclassTemplate,
   priorityclassTemplate,
   namespaceTemplate,
+  deploymentTemplate,
 } from "./lib/template";
 import {} from "./lib/util";
 import PodStoreKey from "./StoreKey/PodStoreKey";
@@ -31,6 +32,7 @@ import PersistentVolumeClaimStoreKey from "./StoreKey/PVCStoreKey";
 import StorageClassStoreKey from "./StoreKey/StorageClassStoreKey";
 import PriorityClassStoreKey from "./StoreKey/PriorityClassStoreKey";
 import NamespaceStoreKey from "./StoreKey/NamespaceStoreKey";
+import DeploymentStoreKey from "./StoreKey/DeploymentStoreKey";
 import {
   V1Node,
   V1PersistentVolumeClaim,
@@ -39,6 +41,7 @@ import {
   V1StorageClass,
   V1PriorityClass,
   V1Namespace,
+  V1Deployment,
 } from "@kubernetes/client-node";
 
 type Resource =
@@ -48,7 +51,8 @@ type Resource =
   | V1PersistentVolume
   | V1StorageClass
   | V1PriorityClass
-  | V1Namespace;
+  | V1Namespace
+  | V1Deployment;
 
 interface Store {
   readonly selected: object | null;
@@ -59,6 +63,11 @@ interface Store {
 export default defineComponent({
   setup() {
     var store: Store | null = null;
+
+    const deploymentstore = inject(DeploymentStoreKey);
+    if (!deploymentstore) {
+      throw new Error(`${DeploymentStoreKey.description} is not provided`);
+    }
 
     const podstore = inject(PodStoreKey);
     if (!podstore) {
@@ -103,11 +112,16 @@ export default defineComponent({
       "Pod",
       "PriorityClass",
       "Namespace",
+      "Deployment",
     ];
 
     const create = (rn: string) => {
       var targetTemplate: Resource | null = null;
       switch (rn) {
+        case "Deployment":
+          store = deploymentstore;
+          targetTemplate = deploymentTemplate();
+          break;
         case "Pod":
           store = podstore;
           targetTemplate = podTemplate();

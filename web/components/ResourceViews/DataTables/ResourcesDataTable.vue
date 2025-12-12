@@ -7,6 +7,7 @@
     <StorageClassDataTable />
     <PriorityClassDataTable />
     <NamespaceDataTable />
+    <DeploymentDataTable />
   </div>
 </template>
 
@@ -19,6 +20,7 @@ import PVCDataTable from "./PVCDataTable.vue";
 import StorageClassDataTable from "./StorageClassDataTable.vue";
 import PriorityClassDataTable from "./PriorityClassDataTable.vue";
 import NamespaceDataTable from "./NamespaceDataTable.vue";
+import DeploymentDataTable from "./DeploymentDataTable.vue";
 
 export default defineComponent({
   components: {
@@ -29,6 +31,7 @@ export default defineComponent({
     StorageClassDataTable,
     PriorityClassDataTable,
     NamespaceDataTable,
+    DeploymentDataTable,
   },
 });
 </script>

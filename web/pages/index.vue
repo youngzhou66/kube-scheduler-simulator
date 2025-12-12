@@ -8,15 +8,17 @@
               <StorageClassStoreProvider>
                 <PriorityClassStoreProvider>
                   <NamespaceStoreProvider>
-                    <SnackbarStoreProvider>
-                      <ResourceWatcher>
-                        <ResourceBar />
-                        <TopBar />
-                        <ResourceAddButton />
-                        <ResourceViewPanel />
-                        <Snackbar />
-                      </ResourceWatcher>
-                    </SnackbarStoreProvider>
+                    <DeploymentStoreProvider>
+                      <SnackbarStoreProvider>
+                        <ResourceWatcher>
+                          <ResourceBar />
+                          <TopBar />
+                          <ResourceAddButton />
+                          <ResourceViewPanel />
+                          <Snackbar />
+                        </ResourceWatcher>
+                      </SnackbarStoreProvider>
+                    </DeploymentStoreProvider>
                   </NamespaceStoreProvider>
                 </PriorityClassStoreProvider>
               </StorageClassStoreProvider>
@@ -46,6 +48,7 @@ import ResourceAddButton from "~/components/ResourceAddButton.vue";
 import ResourceBar from "~/components/ResourceBar/ResourceBar.vue";
 import Snackbar from "~/components/Snackbar.vue";
 import ResourceWatcher from "~/components/ResourceWatcher.vue";
+import DeploymentStoreProvider from "~/components/StoreProvider/DeploymentStoreProvider.vue";
 
 export default defineComponent({
   components: {
@@ -65,6 +68,7 @@ export default defineComponent({
     SchedulerConfigurationStoreProvider,
     PriorityClassStoreProvider,
     ResourceWatcher,
+    DeploymentStoreProvider,
   },
 });
 </script>

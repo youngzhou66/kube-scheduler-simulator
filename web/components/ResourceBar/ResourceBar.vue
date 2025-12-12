@@ -67,9 +67,11 @@ import {
   V1StorageClass,
   V1PriorityClassList,
   V1Namespace,
+  V1Deployment,
 } from "@kubernetes/client-node";
 import SnackBarStoreKey from "../StoreKey/SnackBarStoreKey";
 import { SchedulerConfiguration } from "~/api/v1/types";
+import DeploymentStoreKey from "../StoreKey/DeploymentStoreKey";
 
 type Resource =
   | V1Pod
@@ -79,7 +81,8 @@ type Resource =
   | V1StorageClass
   | V1PriorityClassList
   | SchedulerConfiguration
-  | V1Namespace;
+  | V1Namespace
+  | V1Deployment;
 
 interface Store {
   readonly selected: object | null;
@@ -107,6 +110,10 @@ export default defineComponent({
     var store: Store | null = null;
 
     // inject stores
+    const deploymentStore = inject(DeploymentStoreKey);
+    if (!deploymentStore) {
+      throw new Error(`${DeploymentStoreKey.description} is not provided`);
+    }
     const podstore = inject(PodStoreKey);
     if (!podstore) {
       throw new Error(`${PodStoreKey.description} is not provided`);
@@ -164,6 +171,12 @@ export default defineComponent({
       if (pod.value?.item) {
         selectedPod.value = pod.value.item
       }
+    });
+
+    const dStore = computed(() => deploymentStore.selected);
+    watch(dStore, () => {
+      store = deploymentStore;
+      selected.value = dStore.value;
     });
 
     const node = computed(() => nodestore.selected);

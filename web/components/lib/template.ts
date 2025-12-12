@@ -6,8 +6,17 @@ import {
   V1StorageClass,
   V1PriorityClass,
   V1Namespace,
+  V1Deployment,
 } from "@kubernetes/client-node";
 import yaml from "js-yaml";
+
+export const deploymentTemplate = (): V1Deployment => {
+  if (process.env.DEPLOYMENT_TEMPLATE) {
+    const temp = yaml.load(process.env.DEPLOYMENT_TEMPLATE);
+    return <V1Deployment>temp;
+  }
+  return {};
+};
 
 export const podTemplate = (): V1Pod => {
   if (process.env.POD_TEMPLATE) {

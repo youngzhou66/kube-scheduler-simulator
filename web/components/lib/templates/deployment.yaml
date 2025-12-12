@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-test-1
+  annotations:
+    sp-block: "8"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      nodeSelector:
+        host-arch: huawei-arm
+        accelerator-type: 900SuperPod-A5-8
+      schedulerName: volcano
+      containers:
+        - name: busybox-container
+          image: registry.k8s.io/pause:3.5
+          resources:
+            requests:
+              huawei.com/Ascend910: 8
+            limits:
+              huawei.com/Ascend910: 8

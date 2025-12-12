@@ -10,6 +10,7 @@ import { SchedulerconfigurationAPI } from "./v1/schedulerconfiguration";
 import { StorageClassAPI } from "./v1/storageclass";
 import { WatcherAPI } from "./v1/watcher";
 import { NamespaceAPI } from "./v1/namespace";
+import { DeploymentAPI } from "./v1/deployment";
 
 export const PodAPIKey: InjectionKey<PodAPI> = Symbol("PodAPI");
 export const NodeAPIKey: InjectionKey<NodeAPI> = Symbol("NodeAPI");
@@ -25,3 +26,4 @@ export const StorageClassAPIKey: InjectionKey<StorageClassAPI> =
   Symbol("StorageClassAPI");
 export const WatcherAPIKey: InjectionKey<WatcherAPI> = Symbol("WatcherAPI");
 export const NamespaceAPIKey: InjectionKey<NamespaceAPI> = Symbol("NamespaceAPI");
+export const DeploymentAPIKey: InjectionKey<DeploymentAPI> = Symbol("DeploymentAPI");
