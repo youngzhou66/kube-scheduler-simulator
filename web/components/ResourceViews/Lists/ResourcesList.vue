@@ -1,6 +1,7 @@
 <template>
   <div>
     <NodeList />
+    <DeploymentList />
     <UnscheduledPodList />
     <PVList />
     <PVCList />
@@ -19,11 +20,13 @@ import PVCList from "./PVCList.vue";
 import StorageClassList from "./StorageClassList.vue";
 import PriorityClassList from "./PriorityClassList.vue";
 import NamespaceList from "./NamespaceList.vue";
+import DeploymentList from "./DeploymentList.vue";
 
 export default defineComponent({
   components: {
     NodeList,
     UnscheduledPodList,
+    DeploymentList,
     PVList,
     PVCList,
     StorageClassList,

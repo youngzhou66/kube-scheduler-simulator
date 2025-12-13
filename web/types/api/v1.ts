@@ -7,4 +7,5 @@ export type LastResourceVersions = {
   storageClasses: string;
   priorityClasses: string;
   namespaces: string;
+  deployments: string;
 };

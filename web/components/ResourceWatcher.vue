@@ -18,6 +18,7 @@ import { WatcherAPIKey } from "~/api/APIProviderKeys";
 import { WatchEventType } from "@/types/resources";
 import { LastResourceVersions } from "@/types/api/v1";
 import {
+  V1Deployment,
   V1Namespace,
   V1Node,
   V1PersistentVolume,
@@ -26,6 +27,7 @@ import {
   V1PriorityClass,
   V1StorageClass,
 } from "@kubernetes/client-node";
+import DeploymentStoreKey from "./StoreKey/DeploymentStoreKey";
 
 export default defineComponent({
   setup() {
@@ -69,9 +71,14 @@ export default defineComponent({
     if (!snackbarstore) {
       throw new Error(`${SnackBarStoreKey.description} is not provided`);
     }
+    const dstore = inject(DeploymentStoreKey);
+    if (!dstore) {
+      throw new Error(`${DeploymentStoreKey.description} is not provided`);
+    }
 
     // Initializes each resource and starts watching.
     onMounted(async () => {
+      await dstore.initList();
       await pstore.initList();
       await nstore.initList();
       await pvcstore.initList();
@@ -91,6 +98,7 @@ export default defineComponent({
         storageClasses: storageclassstore.lastResourceVersion,
         priorityClasses: priorityclassstore.lastResourceVersion,
         namespaces: namespacestore.lastResourceVersion,
+        deployments: dstore.lastResourceVersion,
       } as LastResourceVersions;
     };
 
@@ -187,6 +195,16 @@ export default defineComponent({
                     );
                     break;
                   }
+                  case resourceKind.DEPLOYMENTS: {
+                    dstore.watchEventHandler(
+                        event.EventType,
+                        event.Obj as V1Deployment
+                    );
+                    dstore.setLastResourceVersion(
+                        event.Obj as V1Deployment
+                    );
+                    break;
+                  }
                 }
               } catch (error) {
                 snackbarstore.setServerErrorMessage(
@@ -223,6 +241,7 @@ enum resourceKind {
   SCS = "storageclasses",
   PCS = "priorityclasses",
   NAMESPACES = "namespaces",
+  DEPLOYMENTS = "deployments"
 }
 
 function onNewLine(buffer: string, fn: Function): string {

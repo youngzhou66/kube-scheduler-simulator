@@ -48,7 +48,7 @@ export default defineComponent({
     provide(StorageClassAPIKey, storageClassAPI(app.$k8sStorageInstance));
     provide(NamespaceAPIKey, namespaceAPI(app.$k8sInstance))
     provide(WatcherAPIKey, watcherAPI(app.$instance));
-    provide(DeploymentAPIKey, deploymentAPI(app.$instance));
+    provide(DeploymentAPIKey, deploymentAPI(app.$k8sDeploymentInstance, app.$instance));
     return {};
   },
 });

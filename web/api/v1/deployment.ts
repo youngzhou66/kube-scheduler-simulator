@@ -1,13 +1,15 @@
-import { V1Deployment } from "@kubernetes/client-node";
+import { V1Deployment, V1DeploymentList } from "@kubernetes/client-node";
 import { AxiosInstance } from "axios";
 
 export default function deploymentAPI(
+  k8sDeploymentInstance: AxiosInstance,
   instance: AxiosInstance
 ) {
   return {
     listDeployment: async () => {
       try {
-        return {};
+        const res = await k8sDeploymentInstance.get<V1DeploymentList>("/deployments", {});
+        return res.data;
       } catch (e: any) {
         throw new Error("failed to list");
       }
@@ -22,7 +24,16 @@ export default function deploymentAPI(
       } catch (e: any) {
         throw new Error(`failed to create deployment: ${e}`);
       }
-    }
+    },
+
+    deleteDeployment: async (name: string) => {
+      try {
+        const res = await instance.delete<V1Deployment>(`/deleteDeployment/default/${name}`, {});
+        return res.data;
+      } catch (e: any) {
+        throw new Error(`failed to delete deployment: ${e}`);
+      }
+    },
 
   };
 }

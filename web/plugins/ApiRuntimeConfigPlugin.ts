@@ -26,10 +26,18 @@ const ApiRuntimeConfigPlugin: Plugin = (context, inject): void => {
     withCredentials: true,
   });
 
+  const k8sDeploymentBaseURL =
+      context.$config.kubeApiServerURL + "/apis/apps/v1/";
+  const k8sDeploymentInstance = context.$axios.create({
+    baseURL: k8sDeploymentBaseURL,
+    withCredentials: true,
+  });
+
   inject("instance", instance);
   inject("k8sInstance", k8sInstance);
   inject("k8sSchedulingInstance", k8sSchedulingInstance);
   inject("k8sStorageInstance", k8sStorageInstance);
+  inject("k8sDeploymentInstance", k8sDeploymentInstance);
 };
 
 export default ApiRuntimeConfigPlugin;
