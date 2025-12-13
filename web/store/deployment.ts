@@ -92,7 +92,6 @@ export default function deploymentStore() {
     resetSelected() { },
     async apply(d: V1Deployment) {
       await deploymentAPI.createDeployment(d)
-      this.initList()
     },
     async fetchSelected() { },
     async delete(d: V1Deployment) {

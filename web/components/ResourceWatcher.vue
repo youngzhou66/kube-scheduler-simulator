@@ -78,7 +78,8 @@ export default defineComponent({
 
     // Initializes each resource and starts watching.
     onMounted(async () => {
-      await dstore.initList();
+      // await dstore.initList();
+      // TODO 不注释掉会出现重复 问题未知..
       await pstore.initList();
       await nstore.initList();
       await pvcstore.initList();
