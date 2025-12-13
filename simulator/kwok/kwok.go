@@ -48,49 +48,65 @@ func (s *Service) AddNode(ctx context.Context, node *corev1.Node) error {
 	return nil
 }
 
-//func (s *Service) AddNodes(ctx context.Context, node *corev1.Node, count int) error {
-//	// todo 要不要优化成多线程 现在好慢...
-//	nodeName := node.Name
-//	for i := 1; i <= count; i++ {
-//		node.Name = fmt.Sprintf("%s-%d", nodeName, i)
-//		if err := s.createOrUpdateNode(ctx, node, node.Name); err != nil {
-//			return fmt.Errorf("failed to create or update node %s: %w", nodeName, err)
-//		}
-//	}
-//	return nil
-//}
-
 func (s *Service) AddNodes(ctx context.Context, node *corev1.Node, count int) error {
-	nodeName := node.Name
-	errCh := make(chan error, (count+7)/8) // 缓冲通道存储错误
+	rackNodeNameMap := make(map[int][]string)
+
+	for i := 0; i < count; i++ {
+		nodeName := fmt.Sprintf("%s-%d", node.Name, i)
+		rackID := i / 8
+		if _, exist := rackNodeNameMap[rackID]; !exist {
+			rackNodeNameMap[rackID] = make([]string, 0)
+		}
+		rackNodeNameMap[rackID] = append(rackNodeNameMap[rackID], nodeName)
+	}
+	// 1个框一个线程 最多4个线程 超过4的话 平均分
+	threadCount := 1
+	if len(rackNodeNameMap) >= 4 {
+		threadCount = 4
+	} else {
+		threadCount = len(rackNodeNameMap)
+	}
+
 	var wg sync.WaitGroup
-	threadCount := (count + 7) / 8
-	for t := 0; t < threadCount; t++ {
+	errCh := make(chan error, threadCount)
+	for i := 0; i < threadCount; i++ {
 		wg.Add(1)
 		go func(threadID int) {
 			defer wg.Done()
-			start := threadID*8 + 1
-			end := start + 7
-			if end > count {
-				end = count
-			}
-			nodeCopy := node.DeepCopy()
-			nodeCopy.Annotations["rackID"] = fmt.Sprintf("%d", threadID)
-			for i := start; i <= end; i++ {
-				nodeCopy.Name = fmt.Sprintf("%s-%d", nodeName, i)
-				if err := s.createOrUpdateNode(ctx, nodeCopy, nodeCopy.Name); err != nil {
-					errCh <- fmt.Errorf("thread %d: failed to create node %s: %w",
-						threadID, nodeCopy.Name, err)
-					return
+			for rackID, nodeNames := range rackNodeNameMap {
+				// 只处理rackID % threadCount == threadID的数据
+				if rackID%threadCount == threadID {
+					// TODO: 这里是实际处理逻辑
+					// 例如: s.processNodes(ctx, nodeNames)
+					fmt.Printf("Thread %d processing rack %d with nodes: %v\n",
+						threadID, rackID, nodeNames)
+					for _, nodeName := range nodeNames {
+						nodeCopy := node.DeepCopy()
+						if err := s.createOrUpdateNode(ctx, nodeCopy, nodeName); err != nil {
+							errCh <- fmt.Errorf("failed to create or update node %s: %w", nodeName, err)
+						}
+					}
 				}
 			}
-		}(t)
+		}(i)
 	}
 
-	wg.Wait()
-	close(errCh)
-	if len(errCh) > 0 {
-		return <-errCh // 返回第一个错误
+	// 等待所有goroutine完成
+	go func() {
+		wg.Wait()
+		close(errCh)
+	}()
+
+	// 收集错误
+	var errors []error
+	for err := range errCh {
+		if err != nil {
+			errors = append(errors, err)
+		}
+	}
+	// 如果有错误，返回第一个错误
+	if len(errors) > 0 {
+		return fmt.Errorf("failed to add nodes: %v", errors[0])
 	}
 	return nil
 }
@@ -114,6 +130,7 @@ func (s *Service) createOrUpdateNode(ctx context.Context, node *corev1.Node, nod
 	if !errors.IsNotFound(err) {
 		return err
 	}
+	node.Name = nodeName
 	return s.createNodeAndConfigMap(ctx, node, nodeName)
 }
 
