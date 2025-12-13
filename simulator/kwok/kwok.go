@@ -82,6 +82,7 @@ func (s *Service) AddNodes(ctx context.Context, node *corev1.Node, count int) er
 						threadID, rackID, nodeNames)
 					for _, nodeName := range nodeNames {
 						nodeCopy := node.DeepCopy()
+						nodeCopy.Annotations["rackID"] = fmt.Sprintf("%d", rackID)
 						if err := s.createOrUpdateNode(ctx, nodeCopy, nodeName); err != nil {
 							errCh <- fmt.Errorf("failed to create or update node %s: %w", nodeName, err)
 						}

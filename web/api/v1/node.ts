@@ -18,6 +18,18 @@ export default function nodeAPI(
         if (req.metadata.managedFields) {
           delete req.metadata.managedFields;
         }
+        const annotationsCount = req.metadata?.annotations?.count;
+        if (annotationsCount) {
+          const countNum = Number(annotationsCount);
+          if (isNaN(countNum)) {
+            throw new Error(`failed to create node: count is not number`);
+          } else if (countNum > 1) {
+            const res = await instance.post<V1Node>(`/addNodes/${countNum}`, req, {
+              headers: { "Content-Type": "application/json" },
+            });
+            return res.data;
+          }
+        }
         const res = await instance.post<V1Node>("/addNode", req, {
           headers: { "Content-Type": "application/json" },
         });
