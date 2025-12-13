@@ -76,8 +76,6 @@ func (s *Service) AddNodes(ctx context.Context, node *corev1.Node, count int) er
 			for rackID, nodeNames := range rackNodeNameMap {
 				// 只处理rackID % threadCount == threadID的数据
 				if rackID%threadCount == threadID {
-					// TODO: 这里是实际处理逻辑
-					// 例如: s.processNodes(ctx, nodeNames)
 					fmt.Printf("Thread %d processing rack %d with nodes: %v\n",
 						threadID, rackID, nodeNames)
 					for _, nodeName := range nodeNames {

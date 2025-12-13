@@ -4,6 +4,7 @@ package resourcewatcher
 
 import (
 	"context"
+	v1 "k8s.io/api/apps/v1"
 
 	"golang.org/x/xerrors"
 	corev1 "k8s.io/api/core/v1"
@@ -20,24 +21,26 @@ import (
 )
 
 const (
-	Pods       sw.ResourceKind = "pods"
-	Nodes      sw.ResourceKind = "nodes"
-	Pvs        sw.ResourceKind = "persistentvolumes"
-	Pvcs       sw.ResourceKind = "persistentvolumeclaims"
-	Scs        sw.ResourceKind = "storageclasses"
-	Pcs        sw.ResourceKind = "priorityclasses"
-	Namespaces sw.ResourceKind = "namespaces"
+	Pods        sw.ResourceKind = "pods"
+	Nodes       sw.ResourceKind = "nodes"
+	Pvs         sw.ResourceKind = "persistentvolumes"
+	Pvcs        sw.ResourceKind = "persistentvolumeclaims"
+	Scs         sw.ResourceKind = "storageclasses"
+	Pcs         sw.ResourceKind = "priorityclasses"
+	Namespaces  sw.ResourceKind = "namespaces"
+	Deployments sw.ResourceKind = "deployments"
 )
 
 // LastResourceVersions includes each resource's LastResourceVersions.
 type LastResourceVersions struct {
-	Pods       string
-	Nodes      string
-	Pvs        string
-	Pvcs       string
-	Scs        string
-	Pcs        string
-	Namespaces string
+	Pods        string
+	Nodes       string
+	Pvs         string
+	Pvcs        string
+	Scs         string
+	Pcs         string
+	Namespaces  string
+	Deployments string
 }
 
 // StreamWriter is an interface that allows send a received WatchEvent to the frontend.
@@ -68,6 +71,7 @@ func (s *Service) ListWatch(ctx context.Context, stream sw.ResponseStream, lrVer
 		neweventProxy(sw, s.client.StorageV1().RESTClient(), Scs, &storagev1.StorageClass{}, lrVersions.Scs),
 		neweventProxy(sw, s.client.SchedulingV1().RESTClient(), Pcs, &schedulingv1.PriorityClass{}, lrVersions.Pcs),
 		neweventProxy(sw, s.client.CoreV1().RESTClient(), Namespaces, &corev1.Namespace{}, lrVersions.Namespaces),
+		neweventProxy(sw, s.client.AppsV1().RESTClient(), Deployments, &v1.Deployment{}, lrVersions.Deployments),
 	}
 	runctx, cancel := context.WithCancel(ctx)
 	defer cancel()
