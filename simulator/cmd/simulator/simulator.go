@@ -49,7 +49,10 @@ func startSimulator() error {
 	}
 
 	restCfg := &rest.Config{
-		Host: cfg.KubeAPIServerURL,
+		Host:    cfg.KubeAPIServerURL,
+		QPS:     50.0,
+		Burst:   100,
+		Timeout: 120 * time.Second,
 	}
 	client := clientset.NewForConfigOrDie(restCfg)
 	dynamicClient := dynamic.NewForConfigOrDie(restCfg)

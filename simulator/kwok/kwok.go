@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"time"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -51,6 +52,10 @@ func (s *Service) AddNode(ctx context.Context, node *corev1.Node) error {
 func (s *Service) AddNodes(ctx context.Context, node *corev1.Node, count int) error {
 	rackNodeNameMap := make(map[int][]string)
 
+	// 超时适配
+	ctx, cancel := context.WithTimeout(ctx, 120*time.Second)
+	defer cancel()
+
 	for i := 0; i < count; i++ {
 		nodeName := fmt.Sprintf("%s-%d", node.Name, i)
 		rackID := i / 8
@@ -81,6 +86,7 @@ func (s *Service) AddNodes(ctx context.Context, node *corev1.Node, count int) er
 					for _, nodeName := range nodeNames {
 						nodeCopy := node.DeepCopy()
 						nodeCopy.Annotations["rackID"] = fmt.Sprintf("%d", rackID)
+						time.Sleep(400 * time.Millisecond)
 						if err := s.createOrUpdateNode(ctx, nodeCopy, nodeName); err != nil {
 							errCh <- fmt.Errorf("failed to create or update node %s: %w", nodeName, err)
 						}
